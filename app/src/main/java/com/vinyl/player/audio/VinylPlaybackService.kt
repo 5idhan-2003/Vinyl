@@ -31,6 +31,7 @@ class VinylPlaybackService : MediaSessionService() {
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
     private var wakeLock: PowerManager.WakeLock? = null
+    private var sessionActivityPendingIntent: PendingIntent? = null
 
     companion object {
         const val CHANNEL_ID = "vinyl_playback_channel_coloros"
@@ -68,7 +69,7 @@ class VinylPlaybackService : MediaSessionService() {
         val openAppIntent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        val sessionActivityPendingIntent = PendingIntent.getActivity(
+        sessionActivityPendingIntent = PendingIntent.getActivity(
             this,
             0,
             openAppIntent,
@@ -76,7 +77,7 @@ class VinylPlaybackService : MediaSessionService() {
         )
 
         mediaSession = MediaSession.Builder(this, player!!)
-            .setSessionActivity(sessionActivityPendingIntent)
+            .setSessionActivity(sessionActivityPendingIntent!!)
             .build()
 
         // 5. Player State Listener for ColorOS notification and wake lock
@@ -120,7 +121,7 @@ class VinylPlaybackService : MediaSessionService() {
             .setContentTitle(currentTrackTitle)
             .setContentText(currentArtist)
             .setSubText("33⅓ RPM • HI-FI")
-            .setContentIntent(session.sessionActivity)
+            .setContentIntent(sessionActivityPendingIntent)
             .setStyle(MediaStyleNotificationHelper.MediaStyle(session))
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
