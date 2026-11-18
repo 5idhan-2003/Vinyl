@@ -1,0 +1,125 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportWidth="240"
+    android:viewportHeight="240">
+
+    <!-- Turntable Deck Base Chassis (Matte Black / Charcoal) -->
+    <path
+        android:fillColor="#121214"
+        android:pathData="M 24,0 L 216,0 A 24,24 0 0 1 240,24 L 240,216 A 24,24 0 0 1 216,240 L 24,240 A 24,24 0 0 1 0,216 L 0,24 A 24,24 0 0 1 24,0 Z" />
+
+    <!-- Chassis Outline Border -->
+    <path
+        android:strokeColor="#2C2C2E"
+        android:strokeWidth="1.5"
+        android:pathData="M 24,1 L 216,1 A 23,23 0 0 1 239,24 L 239,216 A 23,23 0 0 1 216,239 L 24,239 A 23,23 0 0 1 1,216 L 1,24 A 23,23 0 0 1 24,1 Z" />
+
+    <!-- Corner Hex Screws -->
+    <path android:fillColor="#38383A" android:pathData="M 16,16 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+    <path android:fillColor="#38383A" android:pathData="M 224,16 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+    <path android:fillColor="#38383A" android:pathData="M 16,224 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+    <path android:fillColor="#38383A" android:pathData="M 224,224 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+
+    <!-- Platter Outer Well Rim -->
+    <path
+        android:fillColor="#1A1A1D"
+        android:strokeColor="#333336"
+        android:strokeWidth="2"
+        android:pathData="M 112,120 m -82,0 a 82,82 0 1,1 164,0 a 82,82 0 1,1 -164,0" />
+
+    <!-- Vinyl Record Body (White Vinyl Edition) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="1"
+        android:pathData="M 112,120 m -76,0 a 76,76 0 1,1 152,0 a 76,76 0 1,1 -152,0" />
+
+    <!-- Micro-Groove Rings -->
+    <path
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="0.8"
+        android:pathData="M 112,120 m -66,0 a 66,66 0 1,1 132,0 a 66,66 0 1,1 -132,0" />
+    <path
+        android:strokeColor="#D1D1D6"
+        android:strokeWidth="0.8"
+        android:pathData="M 112,120 m -56,0 a 56,56 0 1,1 112,0 a 56,56 0 1,1 -112,0" />
+    <path
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="0.8"
+        android:pathData="M 112,120 m -46,0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" />
+    <path
+        android:strokeColor="#D1D1D6"
+        android:strokeWidth="1"
+        android:pathData="M 112,120 m -36,0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
+
+    <!-- Center Red Label (Nothing Red) -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 112,120 m -28,0 a 28,28 0 1,1 56,0 a 28,28 0 1,1 -56,0" />
+
+    <!-- Center Spindle Ring & Hole -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 112,120 m -7,0 a 7,7 0 1,1 14,0 a 7,7 0 1,1 -14,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 112,120 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 112,120 m -1.5,0 a 1.5,1.5 0 1,1 3,0 a 1.5,1.5 0 1,1 -3,0" />
+
+    <!-- Tonearm Pivot Gimbal Assembly -->
+    <path
+        android:fillColor="#242426"
+        android:strokeColor="#48484A"
+        android:strokeWidth="1.5"
+        android:pathData="M 204,56 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0" />
+
+    <!-- Rear Counterweight -->
+    <path
+        android:strokeColor="#5E5E62"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:pathData="M 204,38 L 204,22" />
+
+    <!-- Inner Gimbal Bearing -->
+    <path
+        android:fillColor="#D1D1D6"
+        android:pathData="M 204,56 m -5,0 a 5,5 0 1,1 10,0 a 5,5 0 1,1 -10,0" />
+
+    <!-- Tonearm Tube (Tracking on Vinyl Record) -->
+    <path
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M 204,56 C 200,95 208,135 152,158" />
+
+    <!-- Headshell & Cartridge (Angled onto record) -->
+    <path
+        android:fillColor="#1C1C1E"
+        android:pathData="M 152,158 L 142,168 L 148,172 L 158,162 Z" />
+
+    <!-- Red Cartridge Dot (Nothing Red) -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 145,170 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+
+    <!-- Stylus Needle Point -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 143,172 m -1,0 a 1,1 0 1,1 2,0 a 1,1 0 1,1 -2,0" />
+
+    <!-- Speed Button 33 RPM (Bottom Left) -->
+    <path
+        android:fillColor="#1C1C1E"
+        android:strokeColor="#3A3A3C"
+        android:strokeWidth="1"
+        android:pathData="M 20,200 L 46,200 A 4,4 0 0 1 50,204 L 50,220 A 4,4 0 0 1 46,224 L 20,224 A 4,4 0 0 1 16,220 L 16,204 A 4,4 0 0 1 20,200 Z" />
+
+    <!-- Speed Indicator Dot (Red) -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 24,212 m -2,0 a 2,2 0 1,1 4,0 a 2,2 0 1,1 -4,0" />
+
+</vector>

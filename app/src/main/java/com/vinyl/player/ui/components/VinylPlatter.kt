@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -21,14 +19,13 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.vinyl.player.theme.NothingBlack
-import com.vinyl.player.theme.NothingDarkGray
-import com.vinyl.player.theme.NothingMidGray
 import com.vinyl.player.theme.NothingRed
-import com.vinyl.player.theme.NothingTextMuted
 import com.vinyl.player.theme.NothingWhite
-import com.vinyl.player.theme.TurntablePlatterRing
 import com.vinyl.player.theme.VinylGrooveDark
 import com.vinyl.player.theme.VinylGrooveLight
+import com.vinyl.player.theme.WhiteVinylBody
+import com.vinyl.player.theme.WhiteVinylGroove
+import com.vinyl.player.theme.WhiteVinylGrooveDeep
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -37,10 +34,10 @@ import kotlin.math.sin
 
 /**
  * Vinyl Platter Component:
- * - Vintage grooved vinyl disc with optical sheen reflections
- * - Strobe dots on platter rim
- * - Center label sticker with Nothing OS aesthetic
- * - Touch scrub / rotational scratch support
+ * - Minimalist White Vinyl Record with bold red center label (as in reference image)
+ * - Concentric audio micro-grooves
+ * - Spindle hole and vintage label typography stamp
+ * - Interactive finger scratching / scrubbing
  */
 @Composable
 fun VinylPlatter(
@@ -48,13 +45,14 @@ fun VinylPlatter(
     isPlaying: Boolean,
     trackTitle: String,
     artistName: String,
+    isWhiteVinyl: Boolean = true,
     onScrubDelta: (Float) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .padding(12.dp),
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(
@@ -83,172 +81,157 @@ fun VinylPlatter(
             val center = Offset(size.width / 2f, size.height / 2f)
             val outerRadius = min(size.width, size.height) / 2f - 4.dp.toPx()
 
-            // 1. Platter Outer Rim & Strobe Markings (Technics SL style)
-            drawPlatterRim(center, outerRadius)
+            // 1. Subtle Platter Drop Shadow
+            drawCircle(
+                color = Color(0x40000000),
+                radius = outerRadius + 2.dp.toPx(),
+                center = center + Offset(0f, 6.dp.toPx())
+            )
 
-            // 2. Spinning Vinyl Disc
+            // 2. Spinning Vinyl Disc (White Vinyl / Black Vinyl)
             rotate(rotationAngle, pivot = center) {
-                drawVinylDisc(center, outerRadius * 0.95f, trackTitle, artistName)
+                drawVinylDisc(
+                    center = center,
+                    vinylRadius = outerRadius,
+                    isWhiteVinyl = isWhiteVinyl,
+                    trackTitle = trackTitle,
+                    artistName = artistName
+                )
             }
 
-            // 3. Static Optical Specular Sheen (Vinyl reflection sheen does not rotate with grooves)
-            drawVinylSpecularReflection(center, outerRadius * 0.95f)
+            // 3. Optical Specular Sheen (Subtle light reflection across grooves)
+            drawVinylSpecular(center, outerRadius, isWhiteVinyl)
 
-            // 4. Center Spindle
+            // 4. Center Spindle Pin
             drawCircle(
-                color = Color(0xFFC0C0C0),
-                radius = 6.dp.toPx(),
+                color = Color(0xFF1A1A1A),
+                radius = 5.dp.toPx(),
                 center = center
             )
             drawCircle(
                 color = NothingBlack,
-                radius = 3.dp.toPx(),
+                radius = 2.5.dp.toPx(),
                 center = center
             )
         }
     }
 }
 
-private fun DrawScope.drawPlatterRim(center: Offset, radius: Float) {
-    // Outer chassis rim
-    drawCircle(
-        color = TurntablePlatterRing,
-        radius = radius,
-        center = center
-    )
-    drawCircle(
-        color = NothingMidGray,
-        radius = radius,
-        center = center,
-        style = Stroke(width = 2.dp.toPx())
-    )
-
-    // Strobe dots around perimeter
-    val strobeCount = 48
-    val dotRadius = 1.5.dp.toPx()
-    val strobeOrbit = radius - 4.dp.toPx()
-    for (i in 0 until strobeCount) {
-        val angleRad = (i * (360f / strobeCount)) * (PI / 180f)
-        val x = center.x + strobeOrbit * cos(angleRad).toFloat()
-        val y = center.y + strobeOrbit * sin(angleRad).toFloat()
-        drawCircle(
-            color = if (i % 2 == 0) Color(0xFF888888) else Color(0xFF555555),
-            radius = dotRadius,
-            center = Offset(x, y)
-        )
-    }
-}
-
 private fun DrawScope.drawVinylDisc(
     center: Offset,
     vinylRadius: Float,
+    isWhiteVinyl: Boolean,
     trackTitle: String,
     artistName: String
 ) {
-    // Main Vinyl Base Disc
+    val discBaseColor = if (isWhiteVinyl) WhiteVinylBody else VinylGrooveDark
+
+    // Main Vinyl Disc Surface
     drawCircle(
-        color = VinylGrooveDark,
+        color = discBaseColor,
         radius = vinylRadius,
         center = center
     )
 
-    // Micro-Grooves (Concentric sound channels)
-    val grooveStart = vinylRadius * 0.38f
-    val grooveEnd = vinylRadius * 0.96f
-    val grooveCount = 42
+    // Outer rim edge border
+    drawCircle(
+        color = if (isWhiteVinyl) Color(0xFFE5E5EA) else Color(0xFF222224),
+        radius = vinylRadius,
+        center = center,
+        style = Stroke(width = 1.dp.toPx())
+    )
+
+    // Concentric Micro-Grooves
+    val grooveStart = vinylRadius * 0.40f
+    val grooveEnd = vinylRadius * 0.94f
+    val grooveCount = 36
     val grooveStep = (grooveEnd - grooveStart) / grooveCount
 
     for (i in 0 until grooveCount) {
         val r = grooveStart + (i * grooveStep)
-        val grooveColor = if (i % 4 == 0) VinylGrooveLight else Color(0xFF101010)
+        val grooveColor = if (isWhiteVinyl) {
+            if (i % 3 == 0) WhiteVinylGrooveDeep else WhiteVinylGroove
+        } else {
+            if (i % 3 == 0) VinylGrooveLight else Color(0xFF141416)
+        }
+
         drawCircle(
             color = grooveColor,
             radius = r,
             center = center,
-            style = Stroke(width = 0.8f.dp.toPx())
+            style = Stroke(width = if (i % 6 == 0) 1.2.dp.toPx() else 0.7.dp.toPx())
         )
     }
 
-    // Run-out groove lead-in ring
+    // Lead-out run groove
     drawCircle(
-        color = Color(0xFF1E1E1E),
+        color = if (isWhiteVinyl) Color(0xFFDCDCE0) else Color(0xFF1A1A1D),
         radius = grooveStart,
         center = center,
         style = Stroke(width = 1.5.dp.toPx())
     )
 
-    // Center Label (Nothing OS Vintage Record Label)
+    // CENTER RED LABEL (Signature element from reference design)
     val labelRadius = vinylRadius * 0.35f
 
-    // Outer label border
     drawCircle(
-        color = NothingDarkGray,
+        color = NothingRed,
         radius = labelRadius,
         center = center
     )
 
-    // Red Center Accent Ring (Nothing Red)
-    drawCircle(
-        color = NothingRed,
-        radius = labelRadius * 0.72f,
-        center = center
-    )
-
-    // Inner core label
+    // Inner center spindle circle
     drawCircle(
         color = NothingBlack,
-        radius = labelRadius * 0.65f,
+        radius = 8.dp.toPx(),
+        center = center
+    )
+    drawCircle(
+        color = NothingWhite,
+        radius = 4.dp.toPx(),
+        center = center
+    )
+    drawCircle(
+        color = NothingBlack,
+        radius = 2.dp.toPx(),
         center = center
     )
 
-    // Center label decorative text dots
-    val dotCount = 8
-    val dotOrbit = labelRadius * 0.85f
-    for (i in 0 until dotCount) {
-        val angleRad = (i * (360f / dotCount)) * (PI / 180f)
-        val x = center.x + dotOrbit * cos(angleRad).toFloat()
-        val y = center.y + dotOrbit * sin(angleRad).toFloat()
+    // Label detail dots / starburst simulation
+    val starPoints = 8
+    val starRadius = labelRadius * 0.65f
+    for (i in 0 until starPoints) {
+        val angle = (i * (360f / starPoints)) * (PI / 180f)
+        val x = center.x + starRadius * cos(angle).toFloat()
+        val y = center.y + starRadius * sin(angle).toFloat()
         drawCircle(
-            color = NothingWhite,
+            color = Color(0x60FFFFFF),
             radius = 1.dp.toPx(),
             center = Offset(x, y)
         )
     }
 }
 
-/**
- * Optical butterfly/bowtie specular sheen across the vinyl grooves
- */
-private fun DrawScope.drawVinylSpecularReflection(center: Offset, vinylRadius: Float) {
-    val innerRadius = vinylRadius * 0.36f
-    val outerRadius = vinylRadius * 0.97f
+private fun DrawScope.drawVinylSpecular(center: Offset, vinylRadius: Float, isWhiteVinyl: Boolean) {
+    val innerRadius = vinylRadius * 0.38f
+    val outerRadius = vinylRadius * 0.95f
 
-    // Two opposing conic sheen reflections
-    val sheenBrush1 = Brush.radialGradient(
-        colors = listOf(Color(0x35FFFFFF), Color(0x00FFFFFF)),
+    val sheenColor = if (isWhiteVinyl) Color(0x20000000) else Color(0x25FFFFFF)
+
+    val sheenBrush = Brush.radialGradient(
+        colors = listOf(sheenColor, Color.Transparent),
         center = center,
         radius = outerRadius
     )
 
-    val path1 = Path().apply {
-        // Upper-right sheen wedge
-        moveTo(center.x + innerRadius * cos(0.3f), center.y + innerRadius * sin(0.3f))
-        lineTo(center.x + outerRadius * cos(0.7f), center.y + outerRadius * sin(0.7f))
-        lineTo(center.x + outerRadius * cos(0.9f), center.y + outerRadius * sin(0.9f))
-        lineTo(center.x + innerRadius * cos(0.5f), center.y + innerRadius * sin(0.5f))
-        close()
+    for (angle in listOf(0.7f, (PI + 0.7f).toFloat())) {
+        val path = Path().apply {
+            moveTo(center.x + innerRadius * cos(angle - 0.2f), center.y + innerRadius * sin(angle - 0.2f))
+            lineTo(center.x + outerRadius * cos(angle - 0.45f), center.y + outerRadius * sin(angle - 0.45f))
+            lineTo(center.x + outerRadius * cos(angle + 0.45f), center.y + outerRadius * sin(angle + 0.45f))
+            lineTo(center.x + innerRadius * cos(angle + 0.2f), center.y + innerRadius * sin(angle + 0.2f))
+            close()
+        }
+        drawPath(path, brush = sheenBrush)
     }
-
-    val path2 = Path().apply {
-        // Lower-left sheen wedge
-        val pi = PI.toFloat()
-        moveTo(center.x + innerRadius * cos(pi + 0.3f), center.y + innerRadius * sin(pi + 0.3f))
-        lineTo(center.x + outerRadius * cos(pi + 0.7f), center.y + outerRadius * sin(pi + 0.7f))
-        lineTo(center.x + outerRadius * cos(pi + 0.9f), center.y + outerRadius * sin(pi + 0.9f))
-        lineTo(center.x + innerRadius * cos(pi + 0.5f), center.y + innerRadius * sin(pi + 0.5f))
-        close()
-    }
-
-    drawPath(path1, brush = sheenBrush1)
-    drawPath(path2, brush = sheenBrush1)
 }

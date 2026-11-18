@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,25 +16,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,18 +57,27 @@ import com.vinyl.player.theme.NothingRed
 import com.vinyl.player.theme.NothingTextMuted
 import com.vinyl.player.theme.NothingTextSecondary
 import com.vinyl.player.theme.NothingWhite
-import com.vinyl.player.ui.components.DotMatrixText
-import com.vinyl.player.ui.components.DotMatrixVUMeter
-import com.vinyl.player.ui.components.Tonearm
-import com.vinyl.player.ui.components.TurntableDeckControls
 import com.vinyl.player.ui.components.VinylPlatter
 
+/**
+ * Vinyl Player Screen - Recreated to match the exact aesthetic of the user's reference design.
+ * Features:
+ * - Minimalist, pure black background
+ * - White vinyl disc with bold red label
+ * - Pill mood dropdown [ Groovy mood v ]
+ * - Heart & Chip icons
+ * - Sleek line progress bar with vertical notch
+ * - Classic transport bar and bottom icon navigation
+ */
 @Composable
 fun TurntablePlayerScreen(
     viewModel: VinylPlayerViewModel,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
+    var isFavorite by remember { mutableStateOf(false) }
+    var isWhiteVinyl by remember { mutableStateOf(true) }
+    var currentMood by remember { mutableStateOf("Groovy mood") }
 
     Box(
         modifier = modifier
@@ -68,75 +88,325 @@ fun TurntablePlayerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(horizontal = 24.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // 1. Technical Top Bar (Nothing Phone Header)
-            TopTechnicalHeader(
-                onOpenLibrary = { viewModel.toggleLibrary(true) }
-            )
+            // 1. Top Bar: Asterisk Logo & Brand Name
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "✲",
+                        fontSize = 18.sp,
+                        color = NothingWhite,
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                    Text(
+                        text = "astromood.fm",
+                        fontFamily = FontFamily.Monospace,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 14.sp,
+                        letterSpacing = 1.sp,
+                        color = NothingWhite
+                    )
+                }
 
-            // 2. Turntable Deck (Vinyl Platter + Mechanical Tonearm)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Mood Pill & Top Actions (Search & More)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // [ Groovy mood  ⌵ ] Pill
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, NothingWhite, RoundedCornerShape(8.dp))
+                            .clickable { viewModel.toggleLibrary(true) }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = currentMood,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = NothingWhite
+                            )
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Dropdown",
+                                tint = NothingWhite,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
+                    // Search & 3-dots Menu
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(onClick = { viewModel.toggleLibrary(true) }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = NothingWhite,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        IconButton(onClick = { /* Menu */ }) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Menu",
+                                tint = NothingWhite,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 2. Center Vinyl Record with Share Icon
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(NothingDarkGray)
-                    .border(1.dp, NothingBorderGray, RoundedCornerShape(24.dp))
-                    .padding(8.dp),
+                    .aspectRatio(1f),
                 contentAlignment = Alignment.Center
             ) {
-                // Spinning Vinyl Platter
+                // Share Icon on top-right of record
+                IconButton(
+                    onClick = { /* Share */ },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 8.dp, end = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share",
+                        tint = NothingWhite,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                // The Vinyl Record (White Vinyl or Classic Black)
                 VinylPlatter(
                     rotationAngle = state.vinylRotationAngle,
                     isPlaying = state.isPlaying,
-                    trackTitle = state.currentTrack?.title ?: "NO DISC",
-                    artistName = state.currentTrack?.artist ?: "READY",
+                    trackTitle = state.currentTrack?.title ?: "Mexican Hero",
+                    artistName = state.currentTrack?.artist ?: "Marzauros",
+                    isWhiteVinyl = isWhiteVinyl,
                     onScrubDelta = { delta -> viewModel.onScrubVinyl(delta) },
-                    modifier = Modifier.fillMaxWidth(0.92f)
-                )
-
-                // Overlaid Mechanical Tonearm
-                Tonearm(
-                    isPlaying = state.isPlaying,
-                    progress = state.progress,
-                    isCueRaised = state.isCueRaised,
-                    modifier = Modifier.matchParentSize()
+                    modifier = Modifier.fillMaxSize(0.92f)
                 )
             }
 
-            // 3. Track Metadata Deck & VU Meter
-            TrackMetadataSection(
-                title = state.currentTrack?.title ?: "NO RECORD LOADED",
-                artist = state.currentTrack?.artist ?: "SELECT TRACK FROM CRATE",
-                currentPosMs = state.currentPositionMs,
-                durationMs = state.durationMs,
-                isPlaying = state.isPlaying
-            )
+            // 3. Track Metadata Section (Title, Artist, Heart & Chip Icons)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = state.currentTrack?.title ?: "Mexican Hero",
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = NothingWhite
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = state.currentTrack?.artist ?: "Marzauros",
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 13.sp,
+                            color = NothingTextMuted
+                        )
+                    }
 
-            // 4. Vintage Turntable Deck Controls (33/45 RPM, Cue, Crackle, Pitch)
-            TurntableDeckControls(
-                is33Rpm = state.is33Rpm,
-                onToggleSpeed = { viewModel.toggleSpeed() },
-                isCueRaised = state.isCueRaised,
-                onToggleCue = { viewModel.toggleCue() },
-                pitchValue = state.pitchPercent,
-                onPitchChange = { viewModel.setPitch(it) },
-                isCrackleEnabled = state.isCrackleEnabled,
-                onToggleCrackle = { viewModel.toggleCrackle() }
-            )
+                    // Heart & Chip Icons
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        IconButton(onClick = { isFavorite = !isFavorite }) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = if (isFavorite) NothingRed else NothingWhite,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
 
-            // 5. Mechanical Transport Controls (Previous, Motor Start/Stop, Next)
-            TransportControlBar(
-                isPlaying = state.isPlaying,
-                onPlayPause = { viewModel.togglePlayPause() },
-                onPrevious = { viewModel.playPrevious() },
-                onNext = { viewModel.playNext() }
-            )
+                        // Nothing Industrial Microchip Icon
+                        IconButton(onClick = { viewModel.toggleSpeed() }) {
+                            Box(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .border(1.5.dp, NothingWhite, RoundedCornerShape(3.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .background(NothingWhite)
+                                )
+                            }
+                        }
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Progress Bar with Vertical Notch & Timestamps
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Slider(
+                        value = state.progress,
+                        onValueChange = { newProgress ->
+                            val newMs = (newProgress * state.durationMs).toLong()
+                            viewModel.onScrubVinyl(newProgress * 360f)
+                        },
+                        colors = SliderDefaults.colors(
+                            thumbColor = NothingWhite,
+                            activeTrackColor = NothingWhite,
+                            inactiveTrackColor = NothingMidGray
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    val curMin = (state.currentPositionMs / 1000) / 60
+                    val curSec = (state.currentPositionMs / 1000) % 60
+                    val durMin = (state.durationMs / 1000) / 60
+                    val durSec = (state.durationMs / 1000) % 60
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = String.format("%d:%02d", curMin, curSec),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            color = NothingWhite
+                        )
+                        Text(
+                            text = String.format("%d:%02d", durMin, durSec),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 11.sp,
+                            color = NothingWhite
+                        )
+                    }
+                }
+            }
+
+            // 4. Transport Controls (|◀, ▶, ▶|)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = { viewModel.playPrevious() },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SkipPrevious,
+                        contentDescription = "Previous Track",
+                        tint = NothingWhite,
+                        modifier = Modifier.size(34.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = { viewModel.togglePlayPause() },
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    Icon(
+                        imageVector = if (state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        contentDescription = "Play/Pause",
+                        tint = NothingWhite,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = { viewModel.playNext() },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SkipNext,
+                        contentDescription = "Next Track",
+                        tint = NothingWhite,
+                        modifier = Modifier.size(34.dp)
+                    )
+                }
+            }
+
+            // 5. Bottom Navigation Bar: (⇄, ◎, 🎨, ♫)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Shuffle / Repeat
+                IconButton(onClick = { /* Toggle repeat */ }) {
+                    Icon(
+                        imageVector = Icons.Default.Repeat,
+                        contentDescription = "Repeat",
+                        tint = NothingWhite,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                // Vinyl Crate / Camera Disc
+                IconButton(onClick = { viewModel.toggleLibrary(true) }) {
+                    Text(
+                        text = "◎",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NothingWhite
+                    )
+                }
+
+                // Palette: Toggle White Vinyl / Black Vinyl
+                IconButton(onClick = { isWhiteVinyl = !isWhiteVinyl }) {
+                    Text(
+                        text = "🎨",
+                        fontSize = 18.sp,
+                        color = NothingWhite
+                    )
+                }
+
+                // Music Library
+                IconButton(onClick = { viewModel.toggleLibrary(true) }) {
+                    Text(
+                        text = "♫",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NothingWhite
+                    )
+                }
+            }
         }
 
         // Library Drawer / Crate Modal
@@ -146,181 +416,6 @@ fun TurntablePlayerScreen(
                 currentTrack = state.currentTrack,
                 onTrackSelect = { viewModel.playTrack(it) },
                 onDismiss = { viewModel.toggleLibrary(false) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun TopTechnicalHeader(onOpenLibrary: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column {
-            DotMatrixText(
-                text = "VINYL (1)",
-                dotSize = 2.dp,
-                dotSpacing = 1.dp
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = "HI-FI / 33.3 RPM DIRECT DRIVE",
-                fontFamily = FontFamily.Monospace,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = NothingTextMuted
-            )
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Live Red LED indicator
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(NothingRed)
-            )
-
-            // Library / Crate button
-            IconButton(
-                onClick = onOpenLibrary,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(NothingDarkGray)
-                    .border(1.dp, NothingBorderGray, CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LibraryMusic,
-                    contentDescription = "Vinyl Crate",
-                    tint = NothingWhite,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun TrackMetadataSection(
-    title: String,
-    artist: String,
-    currentPosMs: Long,
-    durationMs: Long,
-    isPlaying: Boolean
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(NothingDarkGray)
-            .border(1.dp, NothingBorderGray, RoundedCornerShape(16.dp))
-            .padding(14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title.uppercase(),
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                color = NothingWhite,
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = artist.uppercase(),
-                fontFamily = FontFamily.Monospace,
-                fontSize = 11.sp,
-                color = NothingTextSecondary,
-                maxLines = 1
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-
-            // Time readout in monospace
-            val curMin = (currentPosMs / 1000) / 60
-            val curSec = (currentPosMs / 1000) % 60
-            val durMin = (durationMs / 1000) / 60
-            val durSec = (durationMs / 1000) % 60
-            Text(
-                text = String.format("%02d:%02d / %02d:%02d", curMin, curSec, durMin, durSec),
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp,
-                color = NothingRed
-            )
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // Stereo Dot-Matrix VU Meter
-        DotMatrixVUMeter(isPlaying = isPlaying)
-    }
-}
-
-@Composable
-private fun TransportControlBar(
-    isPlaying: Boolean,
-    onPlayPause: () -> Unit,
-    onPrevious: () -> Unit,
-    onNext: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Previous Track
-        IconButton(
-            onClick = onPrevious,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(NothingDarkGray)
-                .border(1.dp, NothingBorderGray, CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.SkipPrevious,
-                contentDescription = "Previous Track",
-                tint = NothingWhite
-            )
-        }
-
-        // Center Motor Start / Stop (Platter Engage)
-        Box(
-            modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(if (isPlaying) NothingRed else NothingWhite)
-                .clickable(onClick = onPlayPause),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                contentDescription = if (isPlaying) "Stop Motor" else "Start Motor",
-                tint = if (isPlaying) NothingWhite else NothingBlack,
-                modifier = Modifier.size(36.dp)
-            )
-        }
-
-        // Next Track
-        IconButton(
-            onClick = onNext,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(NothingDarkGray)
-                .border(1.dp, NothingBorderGray, CircleShape)
-        ) {
-            Icon(
-                imageVector = Icons.Default.SkipNext,
-                contentDescription = "Next Track",
-                tint = NothingWhite
             )
         }
     }

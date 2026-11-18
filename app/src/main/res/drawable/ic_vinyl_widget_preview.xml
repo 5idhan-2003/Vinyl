@@ -3,36 +3,72 @@
     android:height="100dp"
     android:viewportWidth="200"
     android:viewportHeight="100">
-    <!-- Nothing OS styled rounded card background -->
+
+    <!-- Turntable Deck Base (Chassis) -->
     <path
-        android:fillColor="#121212"
-        android:pathData="M 12,0 L 188,0 A 12,12 0 0 1 200,12 L 200,88 A 12,12 0 0 1 188,100 L 12,100 A 12,12 0 0 1 0,88 L 0,12 A 12,12 0 0 1 12,0 Z" />
+        android:fillColor="#121214"
+        android:pathData="M 16,0 L 184,0 A 16,16 0 0 1 200,16 L 200,84 A 16,16 0 0 1 184,100 L 16,100 A 16,16 0 0 1 0,84 L 0,16 A 16,16 0 0 1 16,0 Z" />
     <path
-        android:strokeColor="#383838"
+        android:strokeColor="#2C2C2E"
         android:strokeWidth="1"
-        android:pathData="M 12,0.5 L 188,0.5 A 11.5,11.5 0 0 1 199.5,12 L 199.5,88 A 11.5,11.5 0 0 1 188,99.5 L 12,99.5 A 11.5,11.5 0 0 1 0.5,88 L 0.5,12 A 11.5,11.5 0 0 1 12,0.5 Z" />
-    <!-- Vinyl Platter Circle -->
+        android:pathData="M 16,0.5 L 184,0.5 A 15.5,15.5 0 0 1 199.5,16 L 199.5,84 A 15.5,15.5 0 0 1 184,99.5 L 16,99.5 A 15.5,15.5 0 0 1 0.5,84 L 0.5,16 A 15.5,15.5 0 0 1 16,0.5 Z" />
+
+    <!-- Left: Turntable Platter (Large White Vinyl Disc) -->
     <path
-        android:fillColor="#000000"
-        android:strokeColor="#222222"
-        android:strokeWidth="2"
-        android:pathData="M 50,50 m -36,0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
-    <!-- Inner Groove -->
-    <path
-        android:fillColor="#00000000"
-        android:strokeColor="#333333"
-        android:strokeWidth="1"
-        android:pathData="M 50,50 m -24,0 a 24,24 0 1,1 48,0 a 24,24 0 1,1 -48,0" />
-    <!-- Red Center Label -->
-    <path
-        android:fillColor="#D71921"
-        android:pathData="M 50,50 m -10,0 a 10,10 0 1,1 20,0 a 10,10 0 1,1 -20,0" />
-    <!-- Spindle Dot -->
+        android:fillColor="#1A1A1D"
+        android:strokeColor="#333336"
+        android:strokeWidth="1.5"
+        android:pathData="M 52,50 m -42,0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" />
+
+    <!-- White Vinyl Record -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M 50,50 m -2,0 a 2,2 0 1,1 4,0 a 2,2 0 1,1 -4,0" />
-    <!-- Nothing Status Dot -->
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="0.8"
+        android:pathData="M 52,50 m -39,0 a 39,39 0 1,1 78,0 a 39,39 0 1,1 -78,0" />
+
+    <!-- Micro-groove lines -->
     <path
-        android:fillColor="#D71921"
-        android:pathData="M 100,25 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="0.6"
+        android:pathData="M 52,50 m -30,0 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0" />
+    <path
+        android:strokeColor="#D1D1D6"
+        android:strokeWidth="0.6"
+        android:pathData="M 52,50 m -22,0 a 22,22 0 1,1 44,0 a 22,22 0 1,1 -44,0" />
+
+    <!-- Center Red Label -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 52,50 m -14,0 a 14,14 0 1,1 28,0 a 14,14 0 1,1 -28,0" />
+
+    <!-- Spindle Pin -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 52,50 m -3.5,0 a 3.5,3.5 0 1,1 7,0 a 3.5,3.5 0 1,1 -7,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 52,50 m -1.5,0 a 1.5,1.5 0 1,1 3,0 a 1.5,1.5 0 1,1 -3,0" />
+
+    <!-- Tonearm Assembly Over Platter -->
+    <path
+        android:fillColor="#242426"
+        android:pathData="M 96,24 m -7,0 a 7,7 0 1,1 14,0 a 7,7 0 1,1 -14,0" />
+    <path
+        android:strokeColor="#E5E5EA"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M 96,24 C 95,42 98,62 70,72" />
+    <!-- Headshell + Red Cartridge -->
+    <path
+        android:fillColor="#1C1C1E"
+        android:pathData="M 70,72 L 64,78 L 68,81 L 74,75 Z" />
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 66,79 m -1.5,0 a 1.5,1.5 0 1,1 3,0 a 1.5,1.5 0 1,1 -3,0" />
+
+    <!-- Right Side: Status dot -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M 112,24 m -2.5,0 a 2.5,2.5 0 1,1 5,0 a 2.5,2.5 0 1,1 -5,0" />
 </vector>

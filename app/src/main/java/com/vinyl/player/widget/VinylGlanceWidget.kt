@@ -10,7 +10,6 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
-import androidx.glance.action.actionParametersOf
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
@@ -25,6 +24,7 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
@@ -43,58 +43,58 @@ import com.vinyl.player.theme.NothingTextMuted
 import com.vinyl.player.theme.NothingWhite
 
 /**
- * Vintage Vinyl × Nothing OS Homescreen Widget
+ * Vinyl Player Widget - Authentic Turntable Deck Design
+ * Designed to look like a physical vinyl player on your home screen.
  */
 class VinylGlanceWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                VinylWidgetContent()
+                TurntableWidgetDeck()
             }
         }
     }
 
     @Composable
-    private fun VinylWidgetContent() {
+    private fun TurntableWidgetDeck() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(ColorProvider(NothingCharcoal))
                 .cornerRadius(24.dp)
-                .padding(14.dp)
-                .clickable(actionStartActivity<MainActivity>())
+                .padding(10.dp)
+                .clickable(actionStartActivity<MainActivity>()),
+            contentAlignment = Alignment.Center
         ) {
             Row(
                 modifier = GlanceModifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Mini Vinyl Disc Platter Icon
+                // 1. Physical Turntable Platter & Tonearm Unit
                 Box(
                     modifier = GlanceModifier
-                        .size(76.dp)
-                        .cornerRadius(38.dp)
+                        .size(100.dp)
+                        .cornerRadius(20.dp)
                         .background(ColorProvider(NothingBlack)),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        provider = ImageProvider(R.drawable.ic_vinyl_widget_preview),
-                        contentDescription = "Vinyl Platter",
+                        provider = ImageProvider(R.drawable.ic_turntable_deck),
+                        contentDescription = "Vinyl Turntable Deck",
                         modifier = GlanceModifier.fillMaxSize()
                     )
                 }
 
-                Spacer(modifier = GlanceModifier.width(14.dp))
+                Spacer(modifier = GlanceModifier.width(12.dp))
 
-                // Track Info & Controls
+                // 2. Turntable Deck Control Panel & Track Readout
                 Column(
-                    modifier = GlanceModifier.defaultWeight()
+                    modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Header Tag
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Red indicator dot
+                    // Deck Header Tag with Red Indicator Dot
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = GlanceModifier
                                 .size(6.dp)
@@ -103,10 +103,19 @@ class VinylGlanceWidget : GlanceAppWidget() {
                         ) {}
                         Spacer(modifier = GlanceModifier.width(6.dp))
                         Text(
-                            text = "VINYL (1)",
+                            text = "VINYL PLAYER",
                             style = TextStyle(
                                 color = ColorProvider(NothingTextMuted),
                                 fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        Spacer(modifier = GlanceModifier.width(8.dp))
+                        Text(
+                            text = "33⅓ RPM",
+                            style = TextStyle(
+                                color = ColorProvider(NothingRed),
+                                fontSize = 9.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         )
@@ -114,9 +123,9 @@ class VinylGlanceWidget : GlanceAppWidget() {
 
                     Spacer(modifier = GlanceModifier.height(4.dp))
 
-                    // Track Title
+                    // Track Title & Artist
                     Text(
-                        text = "ANALOG DRIFT",
+                        text = "Mexican Hero",
                         maxLines = 1,
                         style = TextStyle(
                             color = ColorProvider(NothingWhite),
@@ -124,36 +133,32 @@ class VinylGlanceWidget : GlanceAppWidget() {
                             fontWeight = FontWeight.Bold
                         )
                     )
-
-                    // Artist & RPM
                     Text(
-                        text = "NOTHING SOUND LAB • 33⅓",
+                        text = "Marzauros",
                         maxLines = 1,
                         style = TextStyle(
                             color = ColorProvider(NothingTextMuted),
-                            fontSize = 10.sp
+                            fontSize = 11.sp
                         )
                     )
 
                     Spacer(modifier = GlanceModifier.height(8.dp))
 
-                    // Transport Actions
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        WidgetControlButton(
-                            label = "◀◀",
+                    // Mechanical Turntable Transport Controls
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TurntableDeckButton(
+                            label = "⏮",
                             onClick = actionRunCallback<PreviousActionCallback>()
                         )
                         Spacer(modifier = GlanceModifier.width(8.dp))
-                        WidgetControlButton(
+                        TurntableDeckButton(
                             label = "▶ / ⏸",
-                            isPrimary = true,
+                            isMotorPower = true,
                             onClick = actionRunCallback<PlayPauseActionCallback>()
                         )
                         Spacer(modifier = GlanceModifier.width(8.dp))
-                        WidgetControlButton(
-                            label = "▶▶",
+                        TurntableDeckButton(
+                            label = "⏭",
                             onClick = actionRunCallback<NextActionCallback>()
                         )
                     }
@@ -163,17 +168,17 @@ class VinylGlanceWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun WidgetControlButton(
+    private fun TurntableDeckButton(
         label: String,
-        isPrimary: Boolean = false,
+        isMotorPower: Boolean = false,
         onClick: androidx.glance.action.Action
     ) {
-        val bg = if (isPrimary) ColorProvider(NothingRed) else ColorProvider(NothingBlack)
-        val textClr = if (isPrimary) ColorProvider(NothingWhite) else ColorProvider(NothingWhite)
+        val bg = if (isMotorPower) ColorProvider(NothingRed) else ColorProvider(NothingBlack)
+        val textClr = ColorProvider(NothingWhite)
 
         Box(
             modifier = GlanceModifier
-                .cornerRadius(12.dp)
+                .cornerRadius(10.dp)
                 .background(bg)
                 .clickable(onClick)
                 .padding(horizontal = 10.dp, vertical = 6.dp),
@@ -197,7 +202,7 @@ class PlayPauseActionCallback : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        // Toggle playback via MediaSession / Broadcast
+        // Toggle motor play/pause
     }
 }
 
@@ -207,7 +212,7 @@ class NextActionCallback : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        // Skip track
+        // Next record
     }
 }
 
@@ -217,6 +222,6 @@ class PreviousActionCallback : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters
     ) {
-        // Prev track
+        // Previous record
     }
 }

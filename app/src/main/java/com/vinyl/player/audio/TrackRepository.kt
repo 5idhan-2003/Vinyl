@@ -90,24 +90,33 @@ class TrackRepository(private val context: Context) {
         return listOf(
             Track(
                 id = 1L,
-                title = "ANALOG DRIFT (SIDE A)",
-                artist = "NOTHING SOUND LAB",
-                album = "VINYL ARCHIVE VOL. 1",
-                durationMs = 214000L,
+                title = "Mexican Hero",
+                artist = "Marzauros",
+                album = "Groovy Mood Vol. 1",
+                durationMs = 183000L, // 3:03
                 uri = Uri.parse("https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_sound/engine_start.ogg"),
                 rpm = 33
             ),
             Track(
                 id = 2L,
-                title = "MIDNIGHT GROOVE (45 RPM)",
-                artist = "THE MONOCHROME TRIO",
-                album = "WARSAW SESSIONS",
-                durationMs = 186000L,
+                title = "Analog Drift",
+                artist = "Nothing Sound Lab",
+                album = "Vinyl Archive",
+                durationMs = 214000L,
                 uri = Uri.parse("https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_sound/engine_start.ogg"),
-                rpm = 45
+                rpm = 33
             ),
             Track(
                 id = 3L,
+                title = "Midnight Groove",
+                artist = "The Monochrome Trio",
+                album = "Warsaw Sessions",
+                durationMs = 186000L,
+                uri = Uri.parse("https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_sound/engine_start.ogg"),
+                rpm = 45
+            )
+        )
+    }
                 title = "DOT MATRIX NOCTURNE",
                 artist = "CARL PEI & ENSEMBLE",
                 album = "GLYPH SYMPHONY",
