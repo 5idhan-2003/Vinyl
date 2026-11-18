@@ -100,7 +100,7 @@ class VinylGlanceWidget : GlanceAppWidget() {
                                 .size(6.dp)
                                 .cornerRadius(3.dp)
                                 .background(ColorProvider(NothingRed))
-                        )
+                        ) {}
                         Spacer(modifier = GlanceModifier.width(6.dp))
                         Text(
                             text = "VINYL (1)",
