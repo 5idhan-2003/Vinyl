@@ -3,9 +3,10 @@ name: Build Vinyl APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -36,3 +37,16 @@ jobs:
         name: Vinyl-Player-ColorOS17-Debug-APK
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 14
+
+    - name: Publish GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v1.0.0
+        name: "Vinyl (1) v1.0.0 for OnePlus 13s / ColorOS 17"
+        files: app/build/outputs/apk/debug/app-debug.apk
+        body: |
+          ### Vinyl (1) - Vintage Turntable Music Player for Android
+          - **Hardware Target**: OnePlus 13s
+          - **OS Target**: ColorOS 17 / OxygenOS
+          - **Aesthetic**: Pure Nothing OS (Dot-matrix NDot typography, monochrome, Nothing Red)
+          - **Direct APK**: Download `app-debug.apk` below and install.
