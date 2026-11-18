@@ -53,6 +53,7 @@ import com.vinyl.player.audio.VinylPlayerViewModel
 import com.vinyl.player.theme.NothingBlack
 import com.vinyl.player.theme.NothingBorderGray
 import com.vinyl.player.theme.NothingDarkGray
+import com.vinyl.player.theme.NothingMidGray
 import com.vinyl.player.theme.NothingRed
 import com.vinyl.player.theme.NothingTextMuted
 import com.vinyl.player.theme.NothingTextSecondary

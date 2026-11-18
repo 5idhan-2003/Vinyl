@@ -3,7 +3,6 @@ package com.vinyl.player.audio
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -78,7 +77,7 @@ class TrackRepository(private val context: Context) {
             e.printStackTrace()
         }
 
-        // If no local tracks exist on emulator/device, provide bundled vintage demo records
+        // If no local tracks exist on emulator/device, provide bundled demo records
         if (tracks.isEmpty()) {
             tracks.addAll(getDemoVinylRecords())
         }
@@ -114,15 +113,6 @@ class TrackRepository(private val context: Context) {
                 durationMs = 186000L,
                 uri = Uri.parse("https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_sound/engine_start.ogg"),
                 rpm = 45
-            )
-        )
-    }
-                title = "DOT MATRIX NOCTURNE",
-                artist = "CARL PEI & ENSEMBLE",
-                album = "GLYPH SYMPHONY",
-                durationMs = 245000L,
-                uri = Uri.parse("https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_sound/engine_start.ogg"),
-                rpm = 33
             )
         )
     }
