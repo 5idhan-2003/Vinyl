@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="100dp"
+    android:viewportWidth="200"
+    android:viewportHeight="100">
+    <!-- Nothing OS styled rounded card background -->
+    <path
+        android:fillColor="#121212"
+        android:pathData="M 12,0 L 188,0 A 12,12 0 0 1 200,12 L 200,88 A 12,12 0 0 1 188,100 L 12,100 A 12,12 0 0 1 0,88 L 0,12 A 12,12 0 0 1 12,0 Z" />
+    <path
+        android:strokeColor="#383838"
+        android:strokeWidth="1"
+        android:pathData="M 12,0.5 L 188,0.5 A 11.5,11.5 0 0 1 199.5,12 L 199.5,88 A 11.5,11.5 0 0 1 188,99.5 L 12,99.5 A 11.5,11.5 0 0 1 0.5,88 L 0.5,12 A 11.5,11.5 0 0 1 12,0.5 Z" />
+    <!-- Vinyl Platter Circle -->
+    <path
+        android:fillColor="#000000"
+        android:strokeColor="#222222"
+        android:strokeWidth="2"
+        android:pathData="M 50,50 m -36,0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0" />
+    <!-- Inner Groove -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#333333"
+        android:strokeWidth="1"
+        android:pathData="M 50,50 m -24,0 a 24,24 0 1,1 48,0 a 24,24 0 1,1 -48,0" />
+    <!-- Red Center Label -->
+    <path
+        android:fillColor="#D71921"
+        android:pathData="M 50,50 m -10,0 a 10,10 0 1,1 20,0 a 10,10 0 1,1 -20,0" />
+    <!-- Spindle Dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 50,50 m -2,0 a 2,2 0 1,1 4,0 a 2,2 0 1,1 -4,0" />
+    <!-- Nothing Status Dot -->
+    <path
+        android:fillColor="#D71921"
+        android:pathData="M 100,25 m -3,0 a 3,3 0 1,1 6,0 a 3,3 0 1,1 -6,0" />
+</vector>

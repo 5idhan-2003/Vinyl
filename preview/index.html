@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VINYL (1) - Turntable & Widget Preview</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+    :root {
+      --bg: #000000;
+      --card-bg: #0e0e10;
+      --border: #242426;
+      --border-light: #3a3a3c;
+      --white: #ffffff;
+      --muted: #8e8e93;
+      --red: #d71921;
+      --red-glow: rgba(215, 25, 33, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Space Mono', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px 16px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 36px;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    /* Phone Shell */
+    .phone-frame {
+      width: 380px;
+      min-height: 780px;
+      background: #08080a;
+      border: 2px solid var(--border-light);
+      border-radius: 44px;
+      padding: 24px 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 2px var(--white);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .notch-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .brand-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed var(--border-light);
+      padding-bottom: 10px;
+    }
+
+    .dot-matrix-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--white);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+
+    /* Turntable Platter Deck */
+    .deck-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas#platterCanvas {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    canvas#platterCanvas:active {
+      cursor: grabbing;
+    }
+
+    /* Info Deck & VU Meter */
+    .info-deck {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .track-meta {
+      flex: 1;
+    }
+
+    .track-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .track-artist {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .track-timer {
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* VU Meter */
+    .vu-meter {
+      display: flex;
+      gap: 6px;
+      padding-left: 10px;
+    }
+
+    .vu-channel {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 2.5px;
+      align-items: center;
+    }
+
+    .vu-dot {
+      width: 4px;
+      height: 3px;
+      border-radius: 1px;
+      background: #1c1c1e;
+    }
+    .vu-dot.lit {
+      background: var(--white);
+      box-shadow: 0 0 3px rgba(255,255,255,0.6);
+    }
+    .vu-dot.peak {
+      background: var(--red);
+      box-shadow: 0 0 5px var(--red);
+    }
+    .vu-label {
+      font-size: 8px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Controls Deck */
+    .deck-controls {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pills-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tactile-pill {
+      background: #000;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .tactile-pill:hover {
+      border-color: var(--white);
+    }
+    .pill-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #333;
+    }
+    .pill-dot.active {
+      background: var(--red);
+      box-shadow: 0 0 6px var(--red);
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    input[type=range] {
+      accent-color: var(--red);
+      cursor: pointer;
+    }
+
+    /* Transport Bar */
+    .transport-bar {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .btn-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: transform 0.1s;
+    }
+    .btn-circle:active {
+      transform: scale(0.92);
+    }
+
+    .btn-motor {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: var(--white);
+      color: #000;
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(255,255,255,0.2);
+      transition: all 0.2s ease;
+    }
+    .btn-motor.playing {
+      background: var(--red);
+      color: var(--white);
+      box-shadow: 0 0 20px var(--red-glow);
+    }
+
+    /* Homescreen Widget Side Panel */
+    .widget-panel {
+      flex: 1;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      letter-spacing: 1.5px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      color: var(--muted);
+    }
+
+    /* 4x2 Widget */
+    .widget-4x2 {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 32px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .widget-vinyl-disc {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #242426 0%, #0d0d0e 50%, #000000 100%);
+      border: 1px solid #333;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    }
+    .widget-vinyl-label {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid #000;
+    }
+    .widget-vinyl-disc.spin {
+      animation: spin 2.4s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .widget-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .widget-header-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .widget-track-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .widget-track-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .widget-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .widget-btn {
+      background: #000;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--white);
+      transition: background 0.15s;
+    }
+    .widget-btn.primary {
+      background: var(--red);
+      border-color: var(--red);
+    }
+    .widget-btn:hover {
+      border-color: var(--white);
+    }
+
+    /* 2x2 Widget */
+    .widget-2x2 {
+      width: 170px;
+      height: 170px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 32px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .specs-card {
+      background: #0a0a0c;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+    .specs-card strong {
+      color: var(--white);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Main App Screen (Phone Frame) -->
+    <div class="phone-frame">
+      <div class="notch-bar">
+        <span>03:18</span>
+        <span>ONEPLUS 13S • COLOROS 17 // [NOTHING DESIGN ENGINE]</span>
+      </div>
+
+      <div class="brand-header">
+        <div>
+          <div class="dot-matrix-title">VINYL (1)</div>
+          <div style="font-size: 9px; color: var(--muted); margin-top: 2px;">33.3 RPM DIRECT DRIVE • HI-FI</div>
+        </div>
+        <div class="status-dot"></div>
+      </div>
+
+      <!-- Platter & Tonearm Canvas Deck -->
+      <div class="deck-container">
+        <canvas id="platterCanvas" width="600" height="600"></canvas>
+      </div>
+
+      <!-- Info Deck & Stereo VU Meter -->
+      <div class="info-deck">
+        <div class="track-meta">
+          <div class="track-title" id="trackTitle">ANALOG DRIFT (SIDE A)</div>
+          <div class="track-artist" id="trackArtist">NOTHING SOUND LAB • 33⅓ RPM</div>
+          <div class="track-timer" id="trackTimer">00:00 / 03:34</div>
+        </div>
+        <div class="vu-meter">
+          <div class="vu-channel" id="vuL">
+            <span class="vu-label">L</span>
+          </div>
+          <div class="vu-channel" id="vuR">
+            <span class="vu-label">R</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tactile Deck Controls -->
+      <div class="deck-controls">
+        <div class="pills-row">
+          <div class="tactile-pill" id="pillSpeed">
+            <div class="pill-dot active" id="dotSpeed"></div>
+            <span id="labelSpeed">33⅓ RPM</span>
+          </div>
+          <div class="tactile-pill" id="pillCue">
+            <div class="pill-dot active" id="dotCue"></div>
+            <span id="labelCue">ARM DOWN</span>
+          </div>
+          <div class="tactile-pill" id="pillNoise">
+            <div class="pill-dot active" id="dotNoise"></div>
+            <span id="labelNoise">CRACKLE ON</span>
+          </div>
+        </div>
+
+        <div class="slider-row">
+          <div class="slider-header">
+            <span>QUARTZ PITCH LOCK</span>
+            <span id="pitchDisplay">0.0%</span>
+          </div>
+          <input type="range" id="pitchSlider" min="-8" max="8" step="0.5" value="0">
+        </div>
+      </div>
+
+      <!-- Transport Controls -->
+      <div class="transport-bar">
+        <button class="btn-circle" id="btnPrev">◀◀</button>
+        <button class="btn-motor" id="btnMotor">▶</button>
+        <button class="btn-circle" id="btnNext">▶▶</button>
+      </div>
+    </div>
+
+    <!-- Homescreen Widget Side Mockup -->
+    <div class="widget-panel">
+      <div class="panel-title">HOMESCREEN WIDGET (NOTHING OS)</div>
+
+      <!-- 4x2 Widget -->
+      <div class="widget-4x2">
+        <div class="widget-vinyl-disc" id="widgetDisc">
+          <div class="widget-vinyl-label"></div>
+        </div>
+        <div class="widget-info">
+          <div class="widget-header-tag">
+            <div class="status-dot" style="width: 5px; height: 5px;"></div>
+            <span>VINYL (1) WIDGET</span>
+          </div>
+          <div class="widget-track-title" id="widgetTitle">ANALOG DRIFT</div>
+          <div class="widget-track-meta">NOTHING SOUND LAB • 33⅓</div>
+          <div class="widget-buttons">
+            <button class="widget-btn" onclick="skipTrack(-1)">◀◀</button>
+            <button class="widget-btn primary" id="widgetPlayBtn" onclick="togglePlay()">▶ / ⏸</button>
+            <button class="widget-btn" onclick="skipTrack(1)">▶▶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2x2 Widget & Technical Specs -->
+      <div style="display: flex; gap: 16px;">
+        <!-- 2x2 Circular Mini Widget -->
+        <div class="widget-2x2">
+          <div class="widget-header-tag">
+            <div class="status-dot" style="width: 5px; height: 5px;"></div>
+            <span>MINI DISC</span>
+          </div>
+          <div class="widget-vinyl-disc" id="widgetMiniDisc" style="width: 72px; height: 72px;">
+            <div class="widget-vinyl-label" style="width: 24px; height: 24px;"></div>
+          </div>
+          <button class="widget-btn primary" style="width: 100%;" onclick="togglePlay()">MOTOR</button>
+        </div>
+
+        <!-- Architecture Specs -->
+        <div class="specs-card" style="flex: 1;">
+          <strong>ONEPLUS 13S & COLOROS 17 TUNING:</strong><br>
+          • <strong>Design Language</strong>: Pure Nothing OS Industrial (Dot-Matrix, Monochrome, Red Accents)<br>
+          • <strong>OnePlus O-Haptics</strong>: Bionic motor tactile feedback for vinyl scrub & switches<br>
+          • <strong>120Hz LTPO Fluidity</strong>: 8ms nanoTime frame timing loop<br>
+          • <strong>ColorOS Fluid Cloud</strong>: Aqua Dynamics MediaSession status capsule integration<br>
+          • <strong>ColorOS 17 Widgets</strong>: 4×2 & 2×2 launcher & OnePlus Shelf squircle metrics<br>
+          • <strong>Background Survival</strong>: Partial WakeLock & Foreground Service prevents Quick Freeze
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Audio Synthesizer (Crackle + Warm Analog Tone)
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let crackleNode = null;
+    let osc1 = null, osc2 = null, gainNode = null;
+
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new AudioContext();
+
+      // Vintage vinyl crackle buffer generator
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        // Needle surface noise + intermittent dust pops
+        const isPop = Math.random() < 0.001;
+        output[i] = (Math.random() * 2 - 1) * (isPop ? 0.4 : 0.015);
+      }
+
+      crackleNode = audioCtx.createBufferSource();
+      crackleNode.buffer = noiseBuffer;
+      crackleNode.loop = true;
+
+      const crackleFilter = audioCtx.createBiquadFilter();
+      crackleFilter.type = "highpass";
+      crackleFilter.frequency.value = 1200;
+
+      const crackleGain = audioCtx.createGain();
+      crackleGain.gain.value = 0.6;
+
+      crackleNode.connect(crackleFilter);
+      crackleFilter.connect(crackleGain);
+      crackleGain.connect(audioCtx.destination);
+      crackleNode.start();
+
+      // Analog warm musical pad
+      osc1 = audioCtx.createOscillator();
+      osc2 = audioCtx.createOscillator();
+      osc1.type = "sine";
+      osc2.type = "triangle";
+      osc1.frequency.value = 130.81; // C3
+      osc2.frequency.value = 196.00; // G3
+
+      gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.0;
+
+      osc1.connect(gainNode);
+      osc2.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      osc1.start();
+      osc2.start();
+    }
+
+    // App State
+    let isPlaying = false;
+    let isCueRaised = false;
+    let is33Rpm = true;
+    let isCrackle = true;
+    let pitch = 0;
+    let rotationAngle = 0;
+    let progress = 0; // 0 to 1
+    let trackDurationSec = 214;
+    let currentSec = 0;
+
+    const tracks = [
+      { title: "ANALOG DRIFT (SIDE A)", artist: "NOTHING SOUND LAB • 33⅓ RPM", dur: 214 },
+      { title: "MIDNIGHT GROOVE", artist: "THE MONOCHROME TRIO • 45 RPM", dur: 186 },
+      { title: "DOT MATRIX NOCTURNE", artist: "CARL PEI & ENSEMBLE • 33⅓ RPM", dur: 245 }
+    ];
+    let trackIndex = 0;
+
+    // DOM Elements
+    const canvas = document.getElementById("platterCanvas");
+    const ctx = canvas.getContext("2d");
+    const btnMotor = document.getElementById("btnMotor");
+    const trackTitle = document.getElementById("trackTitle");
+    const trackArtist = document.getElementById("trackArtist");
+    const trackTimer = document.getElementById("trackTimer");
+    const widgetTitle = document.getElementById("widgetTitle");
+    const widgetDisc = document.getElementById("widgetDisc");
+    const widgetMiniDisc = document.getElementById("widgetMiniDisc");
+    const pillSpeed = document.getElementById("pillSpeed");
+    const labelSpeed = document.getElementById("labelSpeed");
+    const pillCue = document.getElementById("pillCue");
+    const labelCue = document.getElementById("labelCue");
+    const dotCue = document.getElementById("dotCue");
+    const pillNoise = document.getElementById("pillNoise");
+    const labelNoise = document.getElementById("labelNoise");
+    const dotNoise = document.getElementById("dotNoise");
+    const pitchSlider = document.getElementById("pitchSlider");
+    const pitchDisplay = document.getElementById("pitchDisplay");
+
+    // VU Meter Setup
+    const vuL = document.getElementById("vuL");
+    const vuR = document.getElementById("vuR");
+    const dotCount = 14;
+    for (let i = 0; i < dotCount; i++) {
+      const dL = document.createElement("div");
+      dL.className = "vu-dot";
+      vuL.appendChild(dL);
+
+      const dR = document.createElement("div");
+      dR.className = "vu-dot";
+      vuR.appendChild(dR);
+    }
+
+    function togglePlay() {
+      initAudio();
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        isCueRaised = false;
+        dotCue.className = "pill-dot active";
+        labelCue.innerText = "ARM DOWN";
+        btnMotor.classList.add("playing");
+        btnMotor.innerText = "⏸";
+        widgetDisc.classList.add("spin");
+        widgetMiniDisc.classList.add("spin");
+        if (gainNode) gainNode.gain.setTargetAtTime(0.2, audioCtx.currentTime, 0.4);
+      } else {
+        btnMotor.classList.remove("playing");
+        btnMotor.innerText = "▶";
+        widgetDisc.classList.remove("spin");
+        widgetMiniDisc.classList.remove("spin");
+        if (gainNode) gainNode.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.3);
+      }
+    }
+
+    btnMotor.addEventListener("click", togglePlay);
+
+    pillSpeed.addEventListener("click", () => {
+      is33Rpm = !is33Rpm;
+      labelSpeed.innerText = is33Rpm ? "33⅓ RPM" : "45 RPM";
+    });
+
+    pillCue.addEventListener("click", () => {
+      isCueRaised = !isCueRaised;
+      dotCue.className = isCueRaised ? "pill-dot" : "pill-dot active";
+      labelCue.innerText = isCueRaised ? "ARM UP" : "ARM DOWN";
+      if (gainNode) {
+        gainNode.gain.setTargetAtTime(isCueRaised || !isPlaying ? 0.0 : 0.2, audioCtx.currentTime, 0.1);
+      }
+    });
+
+    pillNoise.addEventListener("click", () => {
+      isCrackle = !isCrackle;
+      dotNoise.className = isCrackle ? "pill-dot active" : "pill-dot";
+      labelNoise.innerText = isCrackle ? "CRACKLE ON" : "CLEAN";
+    });
+
+    pitchSlider.addEventListener("input", (e) => {
+      pitch = parseFloat(e.target.value);
+      pitchDisplay.innerText = (pitch > 0 ? "+" : "") + pitch.toFixed(1) + "%";
+      if (osc1) {
+        const factor = 1 + pitch / 100;
+        osc1.frequency.setValueAtTime(130.81 * factor, audioCtx.currentTime);
+        osc2.frequency.setValueAtTime(196.00 * factor, audioCtx.currentTime);
+      }
+    });
+
+    function skipTrack(dir) {
+      trackIndex = (trackIndex + dir + tracks.length) % tracks.length;
+      const t = tracks[trackIndex];
+      trackTitle.innerText = t.title;
+      trackArtist.innerText = t.artist;
+      widgetTitle.innerText = t.title.split(" (")[0];
+      trackDurationSec = t.dur;
+      currentSec = 0;
+      progress = 0;
+    }
+
+    document.getElementById("btnNext").addEventListener("click", () => skipTrack(1));
+    document.getElementById("btnPrev").addEventListener("click", () => skipTrack(-1));
+
+    // Touch/Mouse Scratching
+    let isDragging = false;
+    let lastAngle = 0;
+
+    canvas.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      lastAngle = Math.atan2(y, x);
+    });
+
+    window.addEventListener("mouseup", () => isDragging = false);
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const angle = Math.atan2(y, x);
+      const delta = angle - lastAngle;
+      lastAngle = angle;
+      rotationAngle += delta * (180 / Math.PI);
+      currentSec = Math.max(0, Math.min(trackDurationSec, currentSec + delta * 2));
+      progress = currentSec / trackDurationSec;
+    });
+
+    // Render Loop
+    let lastTimestamp = performance.now();
+
+    function render(timestamp) {
+      const dt = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      // Update state
+      if (isPlaying && !isCueRaised) {
+        const baseSpeed = is33Rpm ? 200 : 270;
+        const speed = baseSpeed * (1 + pitch / 100);
+        rotationAngle = (rotationAngle + speed * dt) % 360;
+
+        currentSec = Math.min(trackDurationSec, currentSec + dt * (1 + pitch / 100));
+        progress = currentSec / trackDurationSec;
+
+        if (currentSec >= trackDurationSec) {
+          skipTrack(1);
+        }
+      }
+
+      // Format time
+      const curM = Math.floor(currentSec / 60);
+      const curS = Math.floor(currentSec % 60);
+      const durM = Math.floor(trackDurationSec / 60);
+      const durS = Math.floor(trackDurationSec % 60);
+      trackTimer.innerText = 
+        `${String(curM).padStart(2,'0')}:${String(curS).padStart(2,'0')} / ${String(durM).padStart(2,'0')}:${String(durS).padStart(2,'0')}`;
+
+      // Draw Turntable Canvas
+      drawCanvas();
+
+      // Update VU Meter
+      updateVUMeter(timestamp);
+
+      requestAnimationFrame(render);
+    }
+
+    function drawCanvas() {
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = w * 0.44;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // 1. Platter Outer Rim & Strobe Markings
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#161618";
+      ctx.fill();
+      ctx.strokeStyle = "#333336";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Strobe dots around rim
+      const strobeCount = 54;
+      for (let i = 0; i < strobeCount; i++) {
+        const a = (i * (360 / strobeCount)) * (Math.PI / 180);
+        const sx = cx + (radius - 8) * Math.cos(a);
+        const sy = cy + (radius - 8) * Math.sin(a);
+        ctx.beginPath();
+        ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+        ctx.fillStyle = i % 2 === 0 ? "#777" : "#444";
+        ctx.fill();
+      }
+
+      // 2. Spinning Vinyl Disc
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotationAngle * Math.PI / 180);
+
+      // Vinyl base
+      const vr = radius * 0.94;
+      ctx.beginPath();
+      ctx.arc(0, 0, vr, 0, Math.PI * 2);
+      ctx.fillStyle = "#0a0a0b";
+      ctx.fill();
+
+      // Micro-grooves
+      const gStart = vr * 0.38;
+      const gEnd = vr * 0.96;
+      for (let r = gStart; r < gEnd; r += 5) {
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.strokeStyle = (r % 20 === 0) ? "#1f1f22" : "#111113";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Center Label (Nothing Red)
+      const labelR = vr * 0.34;
+      ctx.beginPath();
+      ctx.arc(0, 0, labelR, 0, Math.PI * 2);
+      ctx.fillStyle = "#1c1c1e";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, labelR * 0.76, 0, Math.PI * 2);
+      ctx.fillStyle = "#d71921";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, labelR * 0.65, 0, Math.PI * 2);
+      ctx.fillStyle = "#000";
+      ctx.fill();
+
+      // Spindle dots
+      for (let i = 0; i < 8; i++) {
+        const da = (i * 45) * Math.PI / 180;
+        ctx.beginPath();
+        ctx.arc(labelR * 0.85 * Math.cos(da), labelR * 0.85 * Math.sin(da), 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      // 3. Static Butterfly Light Specular Sheen (stays fixed)
+      ctx.save();
+      ctx.translate(cx, cy);
+      const sheenGrad = ctx.createRadialGradient(0, 0, vr * 0.38, 0, 0, vr * 0.96);
+      sheenGrad.addColorStop(0, "rgba(255,255,255,0.0)");
+      sheenGrad.addColorStop(0.5, "rgba(255,255,255,0.06)");
+      sheenGrad.addColorStop(1, "rgba(255,255,255,0.0)");
+
+      for (let angle of [0.6, Math.PI + 0.6]) {
+        ctx.beginPath();
+        ctx.moveTo(vr * 0.38 * Math.cos(angle - 0.2), vr * 0.38 * Math.sin(angle - 0.2));
+        ctx.lineTo(vr * 0.96 * Math.cos(angle - 0.4), vr * 0.96 * Math.sin(angle - 0.4));
+        ctx.lineTo(vr * 0.96 * Math.cos(angle + 0.4), vr * 0.96 * Math.sin(angle + 0.4));
+        ctx.lineTo(vr * 0.38 * Math.cos(angle + 0.2), vr * 0.38 * Math.sin(angle + 0.2));
+        ctx.closePath();
+        ctx.fillStyle = sheenGrad;
+        ctx.fill();
+      }
+
+      // Spindle center metal pin
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fillStyle = "#e0e0e0";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#000";
+      ctx.fill();
+
+      ctx.restore();
+
+      // 4. Tonearm Assembly
+      drawTonearm(w, h);
+    }
+
+    function drawTonearm(w, h) {
+      const pivotX = w * 0.82;
+      const pivotY = h * 0.16;
+
+      // Calculate arm angle based on play & progress
+      let targetArmAngle = -10;
+      if (isPlaying && !isCueRaised) {
+        targetArmAngle = 7 + (progress * 22);
+      }
+
+      ctx.save();
+      ctx.translate(pivotX, pivotY);
+      ctx.rotate(targetArmAngle * Math.PI / 180);
+
+      const armLen = h * 0.58;
+
+      // Shadow
+      ctx.beginPath();
+      ctx.moveTo(8, 8);
+      ctx.bezierCurveTo(-4, armLen * 0.35 + 8, 16, armLen * 0.70 + 8, -8, armLen + 8);
+      ctx.strokeStyle = "rgba(0,0,0,0.45)";
+      ctx.lineWidth = 10;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Counterweight behind pivot
+      ctx.beginPath();
+      ctx.moveTo(0, -42);
+      ctx.lineTo(0, -18);
+      ctx.strokeStyle = "#555";
+      ctx.lineWidth = 22;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Tonearm tube (Classic S-curve)
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-12, armLen * 0.35, 8, armLen * 0.70, -16, armLen);
+      ctx.strokeStyle = "#d1d1d6";
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Headshell & Nothing Red Cartridge
+      const hx = -16;
+      const hy = armLen;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy);
+      ctx.lineTo(hx - 12, hy + 30);
+      ctx.lineTo(hx + 2, hy + 32);
+      ctx.lineTo(hx + 5, hy + 8);
+      ctx.closePath();
+      ctx.fillStyle = "#1c1c1e";
+      ctx.fill();
+
+      // Red Cartridge dot
+      ctx.beginPath();
+      ctx.arc(hx - 5, hy + 26, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#d71921";
+      ctx.fill();
+
+      // Stylus tip
+      ctx.beginPath();
+      ctx.arc(hx - 6, hy + 32, 2, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+
+      ctx.restore();
+
+      // Pivot Gimbal Base
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 26, 0, Math.PI * 2);
+      ctx.fillStyle = "#1c1c1e";
+      ctx.fill();
+      ctx.strokeStyle = "#38383a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 14, 0, Math.PI * 2);
+      ctx.fillStyle = "#111";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(pivotX, pivotY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#d1d1d6";
+      ctx.fill();
+    }
+
+    function updateVUMeter(t) {
+      const vuLDots = vuL.getElementsByClassName("vu-dot");
+      const vuRDots = vuR.getElementsByClassName("vu-dot");
+
+      const levelL = (isPlaying && !isCueRaised) ? (Math.sin(t * 0.015) * 0.3 + 0.6) : 0;
+      const levelR = (isPlaying && !isCueRaised) ? (Math.cos(t * 0.018) * 0.35 + 0.55) : 0;
+
+      const activeL = Math.floor(levelL * dotCount);
+      const activeR = Math.floor(levelR * dotCount);
+
+      for (let i = 0; i < dotCount; i++) {
+        // L
+        if (i < activeL) {
+          vuLDots[i].className = i >= dotCount - 3 ? "vu-dot peak" : "vu-dot lit";
+        } else {
+          vuLDots[i].className = "vu-dot";
+        }
+
+        // R
+        if (i < activeR) {
+          vuRDots[i].className = i >= dotCount - 3 ? "vu-dot peak" : "vu-dot lit";
+        } else {
+          vuRDots[i].className = "vu-dot";
+        }
+      }
+    }
+
+    requestAnimationFrame(render);
+  </script>
+</body>
+</html>
